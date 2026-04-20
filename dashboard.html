@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AuditAI Dashboard</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>AuditAI</h2>
+        <a class="active">Dashboard</a>
+        <a href="/">Upload</a>
+        <a href="/export">Export</a>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+
+        <!-- Topbar -->
+        <div class="topbar">
+            <h1>Risk Dashboard</h1>
+            <span class="badge">Live Analysis</span>
+        </div>
+
+        <!-- Cards -->
+        <div class="cards">
+            <div class="card">
+                <p>Total</p>
+                <h2>{{ total }}</h2>
+            </div>
+
+            <div class="card low">
+                <p>Low</p>
+                <h2>{{ summary['Low'] }}</h2>
+            </div>
+
+            <div class="card medium">
+                <p>Medium</p>
+                <h2>{{ summary['Medium'] }}</h2>
+            </div>
+
+            <div class="card high">
+                <p>High</p>
+                <h2>{{ summary['High'] }}</h2>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts">
+
+            <!-- Donut -->
+            <div class="chart-box">
+                <h3>Risk Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="donutChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Line -->
+            <div class="chart-box">
+                <h3>Hourly Trend</h3>
+                <div class="chart-container">
+                    <canvas id="lineChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Department -->
+            <div class="chart-box full">
+                <h3>Top Risk Departments</h3>
+                <div class="chart-container">
+                    <canvas id="deptChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Table -->
+        <div class="table-box">
+            <h3>High Risk Transactions</h3>
+            <div class="table-wrapper">
+                {{ table|safe }}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+const summary = {{ summary | tojson }};
+const hourLabels = {{ hour_labels | tojson }};
+const hourHigh = {{ hour_high | tojson }};
+const deptLabels = {{ dept_labels | tojson }};
+const deptValues = {{ dept_values | tojson }};
+
+// Common options
+function chartOptions(){
+    return {
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{
+            legend:{
+                labels:{ color:"#cbd5e1" }
+            }
+        },
+        scales:{
+            x:{ ticks:{ color:"#94a3b8" }},
+            y:{ ticks:{ color:"#94a3b8" }}
+        }
+    }
+}
+
+// Donut Chart
+new Chart(document.getElementById('donutChart'), {
+    type:'doughnut',
+    data:{
+        labels:['Low','Medium','High'],
+        datasets:[{
+            data:[summary.Low, summary.Medium, summary.High],
+            backgroundColor:['#22c55e','#f59e0b','#ef4444'],
+            borderWidth:0
+        }]
+    },
+    options:{
+        maintainAspectRatio:false,
+        cutout:'65%',
+        plugins:{
+            legend:{ labels:{ color:"#cbd5e1" }}
+        }
+    }
+});
+
+// Line Chart
+new Chart(document.getElementById('lineChart'), {
+    type:'line',
+    data:{
+        labels:hourLabels,
+        datasets:[{
+            label:'High Risk',
+            data:hourHigh,
+            borderColor:'#ef4444',
+            tension:0.4
+        }]
+    },
+    options: chartOptions()
+});
+
+// Department Chart
+new Chart(document.getElementById('deptChart'), {
+    type:'bar',
+    data:{
+        labels:deptLabels,
+        datasets:[{
+            data:deptValues,
+            backgroundColor:'#6366f1'
+        }]
+    },
+    options: chartOptions()
+});
+</script>
+
+</body>
+</html>

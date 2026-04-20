@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Map Columns</title>
+
+<style>
+body {
+    background:#0b0d11;
+    color:white;
+    font-family:Arial;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.card {
+    background:#12151c;
+    padding:30px;
+    border-radius:12px;
+}
+
+select {
+    margin:10px 0;
+    padding:8px;
+}
+
+button {
+    margin-top:10px;
+    padding:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h2>Map Missing Columns</h2>
+<p>Select only missing fields</p>
+
+<form action="/map_columns" method="post">
+
+{% for field in missing %}
+    <div>
+        <label>{{ field }}</label><br>
+
+        <select name="{{ field }}" required>
+            <option value="">Select Column</option>
+
+            {% for col in columns %}
+                <option value="{{ col }}">{{ col }}</option>
+            {% endfor %}
+        </select>
+    </div>
+{% endfor %}
+
+<button type="submit">Continue</button>
+
+</form>
+
+</div>
+
+</body>
+</html>

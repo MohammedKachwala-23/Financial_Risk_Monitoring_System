@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AuditAI</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono&family=Syne:wght@600;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="card">
+
+    <h1>AuditAI</h1>
+    <div class="subtitle">AI-powered transaction risk monitoring</div>
+
+    <form id="uploadForm" action="/analyze" method="post" enctype="multipart/form-data">
+
+        <label class="upload-box" id="dropZone">
+            <div class="upload-icon">📂</div>
+
+            <div class="upload-text">
+                Drag & Drop or Click to Upload
+                <small>CSV / Excel supported</small>
+            </div>
+
+            <input type="file" name="file" id="fileInput" required>
+            <div class="file-name" id="fileName">No file selected</div>
+        </label>
+
+        <button type="submit">Run Risk Analysis</button>
+
+    </form>
+
+</div>
+
+<!-- FULL SCREEN LOADER -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-box">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadingText">
+            Initializing analysis...
+        </div>
+    </div>
+</div>
+
+<script>
+const dropZone = document.getElementById("dropZone");
+const fileInput = document.getElementById("fileInput");
+const fileName = document.getElementById("fileName");
+const form = document.getElementById("uploadForm");
+
+const overlay = document.getElementById("loadingOverlay");
+const loadingText = document.getElementById("loadingText");
+
+// File name
+fileInput.addEventListener("change", () => {
+    fileName.textContent = fileInput.files[0]?.name || "No file selected";
+});
+
+// Drag & drop
+dropZone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropZone.classList.add("dragover");
+});
+
+dropZone.addEventListener("dragleave", () => {
+    dropZone.classList.remove("dragover");
+});
+
+dropZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    fileInput.files = e.dataTransfer.files;
+    fileName.textContent = fileInput.files[0]?.name || "No file selected";
+    dropZone.classList.remove("dragover");
+});
+
+// Loading messages
+const messages = [
+    "Uploading dataset...",
+    "Parsing transactions...",
+    "Detecting anomalies...",
+    "Calculating risk scores...",
+    "Generating insights..."
+];
+
+// Show loader on submit
+form.addEventListener("submit", () => {
+    overlay.style.display = "flex";
+
+    let i = 0;
+    setInterval(() => {
+        i = (i + 1) % messages.length;
+        loadingText.textContent = messages[i];
+    }, 1800);
+});
+</script>
+
+</body>
+</html>
